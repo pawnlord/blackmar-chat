@@ -1,23 +1,69 @@
 import socket               # Import socket module
 
+import sys
+# import thread module 
+from thread import *
+import threading
+
 s = socket.socket()         # Create a socket object
 host = socket.gethostname() # Get local machine name
-port = 12364               # Reserve a port for your service.
+
+if len(sys.argv) <= 2:
+    port = 12365                # Reserve a port for your service.
+else:
+    port = sys.argv[2]                # Reserve a port for your service.
+
 s.bind((host, port))        # Bind to the port
+
 log = open("log.log", "r")
 log_str = log.read()
 log.close()
+
 s.listen(5)                 # Now wait for client connection.
+
+            
+def thread(c, addr):
+   global log_str, s
+   name = addr[0]
+   while True:
+      if len(log_str) > 2048:
+         c.send(log_str[len(log_str)-2048:])
+      else:
+         c.send(log_str)
+      msg = c.recv(1024)
+      print (msg)
+      if msg[0] != '/':
+         log = open("log.log", "a")
+         log.write(name + ": "+ msg + "\n")
+         log.close()
+         log = open("log.log", "r")
+         log_str = log.read()
+         log.close()
+      else:
+         if msg == "/r":
+            pass
+         if msg == "/e":
+            log = open("log.log", "a")
+            log.write(name + ": Logged Out\n")
+            log.close()
+            log = open("log.log", "r")
+            log_str = log.read()
+            log.close()
+            break;
+         if msg[:2] == "/n":
+            log = open("log.log", "a")
+            log.write(name + ": Changed their name to ")
+            name = msg[2:]
+            log.write(name + "\n")
+            log.close()
+            log = open("log.log", "r")
+            log_str = log.read()
+            log.close()
+   c.close()
+   # Close the connection
+
 while True:
    c, addr = s.accept()     # Establish connection with client.
-   print 'Got connection from', addr
-   c.send(log_str)
-   msg = c.recv(1024)
-   print msg
-   log = open("log.log", "a")
-   log.write(str(addr) + ": "+ msg + "\n")
-   log.close()
-   log = open("log.log", "r")
-   log_str = log.read()
-   log.close()
-   c.close()                # Close the connection
+   print ('Got connection from', addr)
+   start_new_thread(thread, (c, addr,)) # Spin new thread to have multiple connections
+s.close()
