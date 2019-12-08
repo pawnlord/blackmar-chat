@@ -32,6 +32,7 @@ def thread(c, addr):
          c.send(log_str)
       msg = c.recv(1024)
       print (msg)
+      msg + " "
       if msg[0] != '/':
          log = open("log.log", "a")
          log.write(name + ": "+ msg + "\n")
@@ -40,9 +41,9 @@ def thread(c, addr):
          log_str = log.read()
          log.close()
       else:
-         if msg == "/r":
+         if msg == "/r ":
             pass
-         if msg == "/e":
+         elif msg == "/e ":
             log = open("log.log", "a")
             log.write(name + ": Logged Out\n")
             log.close()
@@ -50,10 +51,13 @@ def thread(c, addr):
             log_str = log.read()
             log.close()
             break;
-         if msg[:2] == "/n":
+         elif msg[:5] == "/nnv-":
+            name = msg[5:len(msg)]
+            
+         elif msg[:3] == "/n-":
             log = open("log.log", "a")
             log.write(name + ": Changed their name to ")
-            name = msg[2:]
+            name = msg[3:len(msg)]
             log.write(name + "\n")
             log.close()
             log = open("log.log", "r")
