@@ -1,6 +1,23 @@
 import socket               # Import socket module
 import os
 import sys
+import _thread
+import threading
+import time
+import msvcrt
+
+def timed_raw_input(prompt, timeout=5.0):
+    print(prompt)
+    finishat = time.time() + timeout
+    result = []
+    while True:
+        if msvcrt.kbhit():
+            result.append(msvcrt.getche())
+            if result[-1] == '\r':   
+                return ''.join(result)
+        else:
+            if time.time() > finishat and result == []:
+                return ""
 host = socket.gethostname() # Get local machine name
 has_port = False
 name = "GUEST"
@@ -21,17 +38,16 @@ if not has_port:
 
 s = socket.socket()         # Create a socket object
 s.connect((host, port))
-print s.recv(2048)
-s.send("/nnv-" + name)
+print(s.recv(2048))
+s.send(bytes("/nnv-" + name, 'utf-8'))
 os.system("cls");
-
 while True:
-    print s.recv(2048)
-    packet = raw_input("Message: ");
+    print(s.recv(2048).decode('utf-8'))
+    packet = input("Message: ");
     if packet == "":
-        s.send(" ")
+        s.send("/r".encode('utf-8'))
         pass
-    s.send(packet)
+    s.send(packet.encode('utf-8'))
     os.system("cls");
     if packet == "/e":
         s.close()                     # Close the socket when done

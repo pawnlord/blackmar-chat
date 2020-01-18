@@ -2,7 +2,7 @@ import socket               # Import socket module
 
 import sys
 # import thread module 
-from thread import *
+from _thread import *
 import threading
 
 s = socket.socket()         # Create a socket object
@@ -15,9 +15,17 @@ else:
 
 s.bind((host, port))        # Bind to the port
 
-log = open("log.log", "r")
-log_str = log.read()
-log.close()
+try:
+    log = open("log.log", "r+")
+    log_str = log.read()
+    if log_str == "":
+        log.write("===Beginning Of Chat History===")
+    log.close()
+except FileNotFoundError:
+    log = open("log.log", "w+")
+    log.write("===Beginning Of Chat History===")
+    log_str = log.read()
+    log.close()
 
 s.listen(5)                 # Now wait for client connection.
 
@@ -27,10 +35,11 @@ def thread(c, addr):
    name = addr[0]
    while True:
       if len(log_str) > 2048:
-         c.send(log_str[len(log_str)-2048:])
+         c.send(log_str[len(log_str)-2048:].encode('utf-8'))
       else:
-         c.send(log_str)
-      msg = c.recv(1024)
+         c.send(log_str.encode('utf-8'))
+         
+      msg = c.recv(1024).decode('utf-8')
       print (msg)
       msg + " "
       if msg[0] != '/':

@@ -13,6 +13,6 @@ a list of commands:
 - e: loggout  
 - n-: change name  
 - nnv-: change name without it being saved in the conversation  
+  
 ## Using the server  
-to set up blackmar, you have to make an empty log file (named log.log) that will be used as your chat history, and put in text saying something like "===Beginning of Chat History===" with a newline to make it work properly  
-to use the blackmar server after setting up the log all you have to do is run NetworkBase.py with python2, with the first arguement after python2 being an open port you plan on using for your server that the client wil put into the -p arguement.
+To use the blackmar server after setting up the log all you have to do is run NetworkBase.py with python 3, with the first arguement after python being an open port you plan on using for your server that the client will put into the -p arguement.
