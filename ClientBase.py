@@ -22,6 +22,8 @@ host = socket.gethostname() # Get local machine name
 has_port = False
 name = "GUEST"
 port = 0
+channel = ""
+has_channel = False
 for i in range(len(sys.argv)):
     if sys.argv[i] == "-p":
         i+=1
@@ -33,13 +35,20 @@ for i in range(len(sys.argv)):
     elif sys.argv[i] == "-a":
         i+=1
         host = sys.argv[i]
+    elif sys.argv[i] == "-ch":
+        i+=1
+        channel = sys.argv[i]
+        has_channel = True;
 if not has_port:
-    port = 12365
+    port = 12356
 
 s = socket.socket()         # Create a socket object
 s.connect((host, port))
 print(s.recv(2048))
 s.send(bytes("/nnv-" + name, 'utf-8'))
+if has_channel:
+    print(s.recv(2048).decode('utf-8'))
+    s.send(("/cc-"+channel).encode('utf-8'))
 os.system("cls");
 while True:
     print(s.recv(2048).decode('utf-8'))
@@ -50,6 +59,7 @@ while True:
     s.send(packet.encode('utf-8'))
     os.system("cls");
     if packet == "/e":
+        s.recv(2048)
         s.close()                     # Close the socket when done
         break;
 
